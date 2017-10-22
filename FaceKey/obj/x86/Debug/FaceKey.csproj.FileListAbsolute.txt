@@ -1,0 +1,8 @@
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\FaceKey.csproj.App.config
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\FaceKey.csprojResolveAssemblyReference.cache
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\MainWindow.baml
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\MainWindow.g.cs
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\WebCam.g.cs
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\App.g.cs
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\FaceKey_MarkupCompile.cache
+C:\Users\yyeon\source\repos\FaceKey\FaceKey\obj\x86\Debug\FaceKey_MarkupCompile.lref

@@ -55,20 +55,20 @@ namespace FaceKey
             System.Diagnostics.Debug.WriteLine("그룹만들기 시작");
             //Call the Face API.         
             try
-            { 
-                await faceServiceClient.CreatePersonGroupAsync(personGroupId,"Approved_People");
+            {
+                await faceServiceClient.CreatePersonGroupAsync(personGroupId, "Approved_People");
                 System.Diagnostics.Debug.WriteLine("그룹만들기");
                 //Define Anna
                 CreatePersonResult friend1 = await faceServiceClient.CreatePersonAsync(
                    // Id of the person group that the person belonged to
-                   personGroupId, 
+                   personGroupId,
                     //Name of the person
                     "Anna");
                 System.Diagnostics.Debug.WriteLine("Anna 추가");
                 // Define Bill
                 CreatePersonResult friend2 = await faceServiceClient.CreatePersonAsync(
                     //Id of the person group that the person belonged to
-                    personGroupId, 
+                    personGroupId,
                     // Name of the person
                     "Bill");
                 System.Diagnostics.Debug.WriteLine("Bill 추가");
@@ -88,8 +88,9 @@ namespace FaceKey
                         //Detect faces in the image and add to Anna
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend1.PersonId, s);
-                       
-                    } System.Diagnostics.Debug.WriteLine("Anna에 얼굴추가");
+
+                    }
+                    System.Diagnostics.Debug.WriteLine("Anna에 얼굴추가");
                 }//Anna
 
                 foreach (string imagePath in Directory.GetFiles(friend2ImagerDir, "*.jpg"))
@@ -98,8 +99,9 @@ namespace FaceKey
                     {
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend2.PersonId, s);
-                        
-                    }System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
+
+                    }
+                    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
                 }//Bill
 
                 foreach (string imagePath in Directory.GetFiles(friend3ImagerDir, "*.jpg"))
@@ -108,21 +110,22 @@ namespace FaceKey
                     {
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend3.PersonId, s);
-                       
-                    } System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
+
+                    }
+                    System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
                 }//Clare
             }
             //Catch and display Face API errors.           
             catch (FaceAPIException f)
             {
                 MessageBox.Show(f.ErrorMessage, f.ErrorCode);
-                System.Diagnostics.Debug.WriteLine("그룹만들기 FaceAPIException="+f);
+                System.Diagnostics.Debug.WriteLine("그룹만들기 FaceAPIException=" + f);
             }
             //Catch and display all other errors.          
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error");
-                System.Diagnostics.Debug.WriteLine("그룹만들기 오류 Exception="+e);
+                System.Diagnostics.Debug.WriteLine("그룹만들기 오류 Exception=" + e);
             }
         }
 
@@ -153,7 +156,7 @@ namespace FaceKey
             }
         }
 
-        // Displays the image and calls Detect Faces.
+        //Displays the image and calls Detect Faces.
         private async void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -167,28 +170,28 @@ namespace FaceKey
                     await TrainPersonGroup();
                 }
             }
-            // Catch and display Face API errors.           
+             //Catch and display Face API errors.           
             catch (FaceAPIException f)
             {
                 MessageBox.Show(f.ErrorMessage, f.ErrorCode);
             }
-            // Catch and display all other errors.          
+            //Catch and display all other errors.          
             catch (Exception a)
             {
                 MessageBox.Show(a.Message, "Error");
             }
 
-            // Get the image file to scan from the user.          
+            //Get the image file to scan from the user.
             var openDlg = new Microsoft.Win32.OpenFileDialog();
             openDlg.Filter = "JPEG Image(*.jpg)|*.jpg";
-            
-           bool? result = openDlg.ShowDialog(this);
-            // Return if canceled.           
+
+            bool? result = openDlg.ShowDialog(this);
+            //Return if canceled.
             if (!(bool)result)
-            {
-                return;
-            }
-            // Display the image file.            
+                {
+                    return;
+                }
+            //Display the image file.            
             filePath = openDlg.FileName;
             Uri fileUri = new Uri(filePath);
             BitmapImage bitmapSource = new BitmapImage();
@@ -197,15 +200,15 @@ namespace FaceKey
             bitmapSource.UriSource = fileUri;
             bitmapSource.EndInit();
             FacePhoto.Source = bitmapSource;
-       
-            // Detect any faces in the image.           
+
+            //Detect any faces in the image.           
             Title = "Detecting...";
             faces = await UploadAndDetectFaces(filePath);
             Title = String.Format("Detection Finished. {0} face(s) detected", faces.Length);
             if (faces.Length > 0)
             {
-                // Prepare to draw rectangles around the faces.           
-                DrawingVisual visual = new DrawingVisual();
+                //Prepare to draw rectangles around the faces.
+               DrawingVisual visual = new DrawingVisual();
                 DrawingContext drawingContext = visual.RenderOpen();
                 drawingContext.DrawImage(bitmapSource,
                     new Rect(0, 0, bitmapSource.Width, bitmapSource.Height));
@@ -215,7 +218,7 @@ namespace FaceKey
                 for (int i = 0; i < faces.Length; ++i)
                 {
                     Face face = faces[i];
-                    // Draw a rectangle on the face.   
+                    //Draw a rectangle on the face.   
                     drawingContext.DrawRectangle(
                         Brushes.Transparent,
                         new Pen(Brushes.Red, 2),
@@ -232,13 +235,13 @@ namespace FaceKey
 
                 drawingContext.Close();
 
-                // Display the image with the rectangle around the face.         
-                RenderTargetBitmap faceWithRectBitmap = new RenderTargetBitmap(
-                    (int)(bitmapSource.PixelWidth * resizeFactor),
-                    (int)(bitmapSource.PixelHeight * resizeFactor),
-                    96,
-                    96,
-                    PixelFormats.Pbgra32);
+                //Display the image with the rectangle around the face.
+               RenderTargetBitmap faceWithRectBitmap = new RenderTargetBitmap(
+                   (int)(bitmapSource.PixelWidth * resizeFactor),
+                   (int)(bitmapSource.PixelHeight * resizeFactor),
+                   96,
+                   96,
+                   PixelFormats.Pbgra32);
 
                 faceWithRectBitmap.Render(visual);
                 FacePhoto.Source = faceWithRectBitmap;
@@ -248,19 +251,19 @@ namespace FaceKey
                 System.Diagnostics.Debug.WriteLine("비트맵 그리기");
             }
         }
-        // Displays the face description when the mouse is over a face rectangle.
+        //Displays the face description when the mouse is over a face rectangle.
         private void FacePhoto_MouseMove(object sender, MouseEventArgs e)
         {
-            // If the REST call has not completed, return from this method.            
+            //If the REST call has not completed, return from this method.
             if (faces == null)
                 return;
-            // Find the mouse position relative to the image.            
+            //Find the mouse position relative to the image.            
             Point mouseXY = e.GetPosition(FacePhoto);
             ImageSource imageSource = FacePhoto.Source;
             BitmapSource bitmapSource = (BitmapSource)imageSource;
-            // Scale adjustment between the actual size and displayed size.            
-            var scale = FacePhoto.ActualWidth / (bitmapSource.PixelWidth / resizeFactor);
-            // Check if this mouse position is over a face rectangle.            
+            //Scale adjustment between the actual size and displayed size.
+           var scale = FacePhoto.ActualWidth / (bitmapSource.PixelWidth / resizeFactor);
+            //Check if this mouse position is over a face rectangle.            
             bool mouseOverFace = false;
             for (int i = 0; i < faces.Length; ++i)
             {
@@ -269,7 +272,7 @@ namespace FaceKey
                 double top = fr.Top * scale;
                 double width = fr.Width * scale;
                 double height = fr.Height * scale;
-                // Display the face description for this face if the mouse is over this face rectangle.                
+                //Display the face description for this face if the mouse is over this face rectangle.                
                 if (mouseXY.X >= left && mouseXY.X <= left + width && mouseXY.Y >= top && mouseXY.Y <= top + height)
                 {
                     faceDescriptionStatusBar.Text = faceDescriptions[i];
@@ -277,19 +280,19 @@ namespace FaceKey
                     break;
                 }
             }
-            // If the mouse is not over a face rectangle.            
+            //If the mouse is not over a face rectangle.
             if (!mouseOverFace)
                 faceDescriptionStatusBar.Text = "Place the mouse pointer over a face to see the face description.";
             System.Diagnostics.Debug.WriteLine("마우스 이동");
         }
 
-        // Uploads the image file and calls Detect Faces.
+        //Uploads the image file and calls Detect Faces.
         private async Task<Face[]> UploadAndDetectFaces(string imageFilePath)
         {
-            // The list of Face attributes to return.            
-            IEnumerable<FaceAttributeType> faceAttributes =
-                new FaceAttributeType[] { FaceAttributeType.Gender, FaceAttributeType.Age, FaceAttributeType.Smile, FaceAttributeType.Emotion, FaceAttributeType.Glasses, FaceAttributeType.Hair };
-            // Call the Face API.         
+            //The list of Face attributes to return.
+           IEnumerable < FaceAttributeType > faceAttributes =
+               new FaceAttributeType[] { FaceAttributeType.Gender, FaceAttributeType.Age, FaceAttributeType.Smile, FaceAttributeType.Emotion, FaceAttributeType.Glasses, FaceAttributeType.Hair };
+            //Call the Face API.         
             try
             {
                 using (Stream imageFileStream = File.OpenRead(imageFilePath))
@@ -316,21 +319,21 @@ namespace FaceKey
                             //Get top 1 among all candidates returned
                             var candidateId = identifyResult.Candidates[0].PersonId;
                             var person = await faceServiceClient.GetPersonAsync(personGroupId, candidateId);
-                            MessageBox.Show("승인된 사람입니다. "+person.Name);
+                            MessageBox.Show("승인된 사람입니다. " + person.Name);
                             System.Diagnostics.Debug.WriteLine("Identified as {0}", person.Name);
                         }
                     }
                     return faces;
                 }
             }
-            // Catch and display Face API errors.           
+             //Catch and display Face API errors.           
             catch (FaceAPIException f)
             {
                 MessageBox.Show(f.ErrorMessage, f.ErrorCode);
-                System.Diagnostics.Debug.WriteLine("얼굴 식별 & 감지"+f);
+                System.Diagnostics.Debug.WriteLine("얼굴 식별 & 감지" + f);
                 return new Face[0];
             }
-            // Catch and display all other errors.          
+            //Catch and display all other errors.          
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error");
@@ -338,20 +341,20 @@ namespace FaceKey
                 return new Face[0];
             }
         }
-        // Returns a string that describes the given face.
+        //Returns a string that describes the given face.
         private string FaceDescription(Face face)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Face: ");
-            // Add the gender, age, and smile.            
+            //Add the gender, age, and smile.            
             sb.Append(face.FaceAttributes.Gender);
             sb.Append(face.FaceAttributes.Gender);
             sb.Append(", ");
             sb.Append(face.FaceAttributes.Age);
             sb.Append(", ");
             sb.Append(String.Format("smile {0:F1}%, ", face.FaceAttributes.Smile * 100));
-            // Add the emotions. Display all emotions over 10%.            
-            sb.Append("Emotion: ");
+            //Add the emotions.Display all emotions over 10 %.
+          sb.Append("Emotion: ");
             EmotionScores emotionScores = face.FaceAttributes.Emotion;
 
             if (emotionScores.Anger >= 0.1f) sb.Append(String.Format("anger {0:F1}%, ", emotionScores.Anger * 100));
@@ -362,16 +365,16 @@ namespace FaceKey
             if (emotionScores.Neutral >= 0.1f) sb.Append(String.Format("neutral {0:F1}%, ", emotionScores.Neutral * 100));
             if (emotionScores.Sadness >= 0.1f) sb.Append(String.Format("sadness {0:F1}%, ", emotionScores.Sadness * 100));
             if (emotionScores.Surprise >= 0.1f) sb.Append(String.Format("surprise {0:F1}%, ", emotionScores.Surprise * 100));
-            // Add glasses.            
+            //Add glasses.            
             sb.Append(face.FaceAttributes.Glasses);
             sb.Append(", ");
-            // Add hair.            
+            //Add hair.            
             sb.Append("Hair: ");
-            // Display baldness confidence if over 1%.            
+            //Display baldness confidence if over 1 %.
             if (face.FaceAttributes.Hair.Bald >= 0.01f)
                 sb.Append(String.Format("bald {0:F1}% ", face.FaceAttributes.Hair.Bald * 100));
-            // Display all hair color attributes over 10%.            
-            HairColor[] hairColors = face.FaceAttributes.Hair.HairColor;
+            //Display all hair color attributes over 10 %.
+           HairColor[] hairColors = face.FaceAttributes.Hair.HairColor;
             foreach (HairColor hairColor in hairColors)
             {
                 if (hairColor.Confidence >= 0.1f)
@@ -380,9 +383,9 @@ namespace FaceKey
                     sb.Append(String.Format(" {0:F1}% ", hairColor.Confidence * 100));
                 }
             }
-            // Return the built string. 
-            System.Diagnostics.Debug.WriteLine("얼굴설명");
+            //Return the built string.
+           System.Diagnostics.Debug.WriteLine("얼굴설명");
             return sb.ToString();
         }
     }
- }
+}
