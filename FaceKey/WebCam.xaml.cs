@@ -9,18 +9,24 @@ using System.Windows.Threading;
 namespace FaceKey
 {
 
-    public partial class WebCam 
+    public partial class WebCam
     {
-        static String dir = @"C:\WebCamSnapshots\";
+        public static String dir = @"C:\WebCamSnapshots\";
         //1장의 사진만 찍을 수 있도록 세는 변수
         static int time = 0;
         DispatcherTimer timer = new DispatcherTimer();
+        public static String ImageName;
 
+        public String GetImageName()
+        {
+            return dir+ImageName;
+        }
+        
         public WebCam()
         {
             InitializeComponent();
         }
-        
+
         private void ShowCamera(object sender, RoutedEventArgs e)
         {
             var cameras = webCameraControl.GetVideoCaptureDevices().ToArray();
@@ -38,26 +44,43 @@ namespace FaceKey
 
             var list = Directory.GetFiles(dir, "*.jpg").Where(path => reg.IsMatch(path))
                      .ToList();
-            
+
             if (list.Count == 0)
                 return "image1.jpg";
-            
+
             var lastName =
                 list.Select(x => (new FileInfo(x)).Name.Replace("image", "").Replace(".jpg", "")).OrderBy(x => x).Last();
-            
-            return string.Format("image{0}.jpg",int.Parse(lastName)+1);
+           
+            ImageName= string.Format("image{0}.jpg", int.Parse(lastName) + 1);
+            return ImageName;
         }
 
         private void CameraCapture(object sender, EventArgs e)
         {
             time++;
-            if (time > 1)
+            if (time >= 1)
             {
-                System.Diagnostics.Debug.WriteLine("5초 지남");
+                webCameraControl.GetCurrentImage().Save(dir + GetNewFileName());
+                System.Diagnostics.Debug.WriteLine("사진저장성공");
                 timer.Stop();
-                return;
+
+                if (!timer.IsEnabled)
+                {
+                    CloseAndNext();
+                }
+                System.Diagnostics.Debug.WriteLine("5초 지남");
+                System.Diagnostics.Debug.WriteLine(GetImageName()); 
             }
-            webCameraControl.GetCurrentImage().Save(dir+GetNewFileName());
+        }
+        //카메라 끄고 다음 화면으로 넘어가기
+        private void CloseAndNext()
+        {
+            System.Diagnostics.Debug.WriteLine("타이머 꺼짐");
+            webCameraControl.StopCapture();
+            MainWindow face = new MainWindow();
+            this.Close();
+            face.Show();
+
         }
     }
 }
