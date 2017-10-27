@@ -19,7 +19,7 @@ namespace FaceKey
 
         public String GetImageName()
         {
-            return dir+ImageName;
+            return dir + ImageName;
         }
         
         public WebCam()

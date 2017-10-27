@@ -40,9 +40,9 @@ namespace FaceKey
         string friend1ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Anna";
         string friend2ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Bill";
         string friend3ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Clare";
-        string friend4ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
+        //string friend4ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
 
-        const string personGroupId = "my_friend3";
+        const string personGroupId = "my_friend2";
 
         public MainWindow()
         {
@@ -79,13 +79,13 @@ namespace FaceKey
                     //Name of the person
                     "Clare");
                 System.Diagnostics.Debug.WriteLine("Clare 추가");
-                //Define 연경
-                CreatePersonResult friend4 = await faceServiceClient.CreatePersonAsync(
-                    //Id of the person group that the person belonged to
-                    personGroupId,
-                    //Name of the person
-                    "YeonKyeong");
-                System.Diagnostics.Debug.WriteLine("연경 추가");
+                ////Define 연경
+                //CreatePersonResult friend4 = await faceServiceClient.CreatePersonAsync(
+                //    //Id of the person group that the person belonged to
+                //    personGroupId,
+                //    //Name of the person
+                //    "YeonKyeong");
+                //System.Diagnostics.Debug.WriteLine("연경 추가");
 
                 foreach (string imagePath in Directory.GetFiles(friend1ImagerDir, "*.jpg"))
                 {
@@ -121,16 +121,16 @@ namespace FaceKey
                     }
                     System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
                 }//Clare
-                foreach (string imagePath in Directory.GetFiles(friend4ImagerDir, "*.jpg"))
-                {
-                    using (Stream s = File.OpenRead(imagePath))
-                    {
-                        await faceServiceClient.AddPersonFaceAsync(
-                            personGroupId, friend4.PersonId, s);
+                //foreach (string imagePath in Directory.GetFiles(friend4ImagerDir, "*.jpg"))
+                //{
+                //    using (Stream s = File.OpenRead(imagePath))
+                //    {
+                //        await faceServiceClient.AddPersonFaceAsync(
+                //            personGroupId, friend4.PersonId, s);
 
-                    }
-                    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
-                }//연경
+                //    }
+                //    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
+                //}//연경
             }
             //Catch and display Face API errors.           
             catch (FaceAPIException f)
