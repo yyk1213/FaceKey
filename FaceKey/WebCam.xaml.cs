@@ -33,7 +33,7 @@ namespace FaceKey
             var cameraId = (WebCameraId)cameras[0];
             webCameraControl.StartCapture(cameraId);
             //5초 후 사진 찍기
-            timer.Interval = TimeSpan.FromMilliseconds(5000);
+            timer.Interval = TimeSpan.FromMilliseconds(3500);
             timer.Tick += new EventHandler(CameraCapture);
             timer.Start();
         }
@@ -68,7 +68,7 @@ namespace FaceKey
                 {
                     CloseAndNext();
                 }
-                System.Diagnostics.Debug.WriteLine("5초 지남");
+                System.Diagnostics.Debug.WriteLine("3.5초 지남");
                 System.Diagnostics.Debug.WriteLine(GetImageName()); 
             }
         }
@@ -78,6 +78,7 @@ namespace FaceKey
             System.Diagnostics.Debug.WriteLine("타이머 꺼짐");
             webCameraControl.StopCapture();
             MainWindow face = new MainWindow();
+            App.Current.MainWindow = face;
             this.Close();
             face.Show();
 

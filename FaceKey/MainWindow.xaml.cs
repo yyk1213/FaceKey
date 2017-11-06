@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -8,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
 using System.Linq;
+using Microsoft.ProjectOxford.Common;
 
 namespace FaceKey
 {
@@ -24,7 +24,7 @@ namespace FaceKey
         // NOTE: Free trial subscription keys are generated in the westcentralus region, so if you are using       
         // a free trial subscription key, you should not need to change this region.        
         private readonly IFaceServiceClient faceServiceClient =
-            new FaceServiceClient("a5b89150a0a648858b1ab1f16db3a253", "https://westcentralus.api.cognitive.microsoft.com/face/v1.0");
+            new FaceServiceClient("ccaadce75e7d41c6854398bf6b20e25b", "https://westcentralus.api.cognitive.microsoft.com/face/v1.0");
         Face[] faces;
         // The list of detected faces.        
         String[] faceDescriptions;
@@ -37,12 +37,12 @@ namespace FaceKey
         //웹캠 변수사용
         WebCam webCam = new WebCam();
         //Directory contains image files
-        string friend1ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Anna";
+        string friend1ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\JK";
         string friend2ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Bill";
         string friend3ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Clare";
-        //string friend4ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
+        string friend4ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
 
-        const string personGroupId = "my_friend2";
+        const string personGroupId = "my_friend5";
 
         public MainWindow()
         {
@@ -58,13 +58,13 @@ namespace FaceKey
             {
                 await faceServiceClient.CreatePersonGroupAsync(personGroupId, "Approved_People");
                 System.Diagnostics.Debug.WriteLine("그룹만들기");
-                //Define Anna
+                //Define 진선
                 CreatePersonResult friend1 = await faceServiceClient.CreatePersonAsync(
                    // Id of the person group that the person belonged to
                    personGroupId,
                     //Name of the person
-                    "Anna");
-                System.Diagnostics.Debug.WriteLine("Anna 추가");
+                    "JinSeon");
+                System.Diagnostics.Debug.WriteLine("JinSeon 추가");
                 // Define Bill
                 CreatePersonResult friend2 = await faceServiceClient.CreatePersonAsync(
                     //Id of the person group that the person belonged to
@@ -79,34 +79,31 @@ namespace FaceKey
                     //Name of the person
                     "Clare");
                 System.Diagnostics.Debug.WriteLine("Clare 추가");
-                ////Define 연경
-                //CreatePersonResult friend4 = await faceServiceClient.CreatePersonAsync(
-                //    //Id of the person group that the person belonged to
-                //    personGroupId,
-                //    //Name of the person
-                //    "YeonKyeong");
-                //System.Diagnostics.Debug.WriteLine("연경 추가");
+                //Define 연경
+                CreatePersonResult friend4 = await faceServiceClient.CreatePersonAsync(
+                    //id of the person group that the person belonged to
+                    personGroupId,
+                    //name of the person
+                    "YeonKyeong");
+                System.Diagnostics.Debug.WriteLine("연경 추가");
 
                 foreach (string imagePath in Directory.GetFiles(friend1ImagerDir, "*.jpg"))
                 {
                     using (Stream s = File.OpenRead(imagePath))
                     {
-                        System.Diagnostics.Debug.WriteLine("이미지 들어가는 중");
                         //Detect faces in the image and add to Anna
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend1.PersonId, s);
-
                     }
-                    System.Diagnostics.Debug.WriteLine("Anna에 얼굴추가");
-                }//Anna
+                    System.Diagnostics.Debug.WriteLine("JinSeon에 얼굴추가");
+                }//진선
 
                 foreach (string imagePath in Directory.GetFiles(friend2ImagerDir, "*.jpg"))
                 {
                     using (Stream s = File.OpenRead(imagePath))
                     {
                         await faceServiceClient.AddPersonFaceAsync(
-                            personGroupId, friend2.PersonId, s);
-
+                            personGroupId, friend2.PersonId, s);                    
                     }
                     System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
                 }//Bill
@@ -117,20 +114,18 @@ namespace FaceKey
                     {
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend3.PersonId, s);
-
                     }
                     System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
                 }//Clare
-                //foreach (string imagePath in Directory.GetFiles(friend4ImagerDir, "*.jpg"))
-                //{
-                //    using (Stream s = File.OpenRead(imagePath))
-                //    {
-                //        await faceServiceClient.AddPersonFaceAsync(
-                //            personGroupId, friend4.PersonId, s);
-
-                //    }
-                //    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
-                //}//연경
+                foreach (string imagePath in Directory.GetFiles(friend4ImagerDir, "*.jpg"))
+                {
+                    using (Stream s = File.OpenRead(imagePath))
+                    {
+                        await faceServiceClient.AddPersonFaceAsync(
+                            personGroupId, friend4.PersonId, s);
+                    }
+                    System.Diagnostics.Debug.WriteLine("연경에 얼굴추가");
+                }//연경
             }
             //Catch and display Face API errors.           
             catch (FaceAPIException f)
@@ -165,40 +160,47 @@ namespace FaceKey
                     await Task.Delay(1000);
                 }
             }
-            catch (Microsoft.ProjectOxford.Common.ClientException ex)
+            catch (ClientException ex)
             {
                 Console.WriteLine(ex.Error.Code);
                 Console.WriteLine(ex.Error.Message);
                 System.Diagnostics.Debug.WriteLine("트레이닝 오류" + ex);
+            }
+            catch (FaceAPIException f)
+            {
+                MessageBox.Show(f.ErrorMessage, f.ErrorCode);
+                System.Diagnostics.Debug.WriteLine("그룹만들기 FaceAPIException=" + f);
+            }
+        }
+
+        private async Task CheckGroup()
+        {
+            try
+            {   //그룹이 이미 존재한다면 안 만들어도 된다.
+                System.Diagnostics.Debug.WriteLine("그룹체크 시작");
+                PersonGroup personGroup = await faceServiceClient.GetPersonGroupAsync(personGroupId);
+            }
+            //Catch and display Face API errors.           
+            catch (ClientException f)
+            {
+                System.Diagnostics.Debug.WriteLine("체크오류-그룹" + f);
+                await CreatePersonGroup();
+                System.Diagnostics.Debug.WriteLine("체크오류-트레이닝" + f);
+                await TrainPersonGroup();
+            }
+            catch (FaceAPIException f)
+            {
+                System.Diagnostics.Debug.WriteLine("체크오류-그룹" + f);
+                await CreatePersonGroup();
+                System.Diagnostics.Debug.WriteLine("체크오류-트레이닝" + f);
+                await TrainPersonGroup();
             }
         }
 
         //Displays the image and calls Detect Faces.
         private async void ImageShowAndDetect(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                //수정하기
-                PersonGroup personGroup = await faceServiceClient.GetPersonGroupAsync(personGroupId);
-                string PGID = personGroup.PersonGroupId;//그룹이 이미 존재한다면 안 만들어도 된다.
-
-                if (PGID != personGroupId)
-                {
-                    await CreatePersonGroup();
-                    await TrainPersonGroup();
-                }
-            }
-             //Catch and display Face API errors.           
-            catch (FaceAPIException f)
-            {
-                MessageBox.Show(f.ErrorMessage, f.ErrorCode);
-            }
-            //Catch and display all other errors.          
-            catch (Exception a)
-            {
-                MessageBox.Show(a.Message, "Error");
-            }
-
+            await CheckGroup();
             //Display the image file.            
             filePath = webCam.GetImageName();
             Uri fileUri = new Uri(filePath);
@@ -242,12 +244,12 @@ namespace FaceKey
                 drawingContext.Close();
 
                 //Display the image with the rectangle around the face.
-               RenderTargetBitmap faceWithRectBitmap = new RenderTargetBitmap(
-                   (int)(bitmapSource.PixelWidth * resizeFactor),
-                   (int)(bitmapSource.PixelHeight * resizeFactor),
-                   96,
-                   96,
-                   PixelFormats.Pbgra32);
+                RenderTargetBitmap faceWithRectBitmap = new RenderTargetBitmap(
+                    (int)(bitmapSource.PixelWidth * resizeFactor),
+                    (int)(bitmapSource.PixelHeight * resizeFactor),
+                    96,
+                    96,
+                    PixelFormats.Pbgra32);
 
                 faceWithRectBitmap.Render(visual);
                 FacePhoto.Source = faceWithRectBitmap;
