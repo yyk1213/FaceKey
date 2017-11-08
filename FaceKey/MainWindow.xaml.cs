@@ -8,6 +8,7 @@ using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
 using System.Linq;
 using Microsoft.ProjectOxford.Common;
+using System.Net.Sockets;
 
 namespace FaceKey
 {
@@ -35,12 +36,11 @@ namespace FaceKey
         //open filename
 
         //웹캠 변수사용
-        WebCam webCam = new WebCam();
+        static WebCam webCam = new WebCam();
         //Directory contains image files
-        string friend1ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\JK";
-        string friend2ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Bill";
-        string friend3ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Clare";
-        string friend4ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
+        string friend1ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Bill";
+        string friend2ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\Clare";
+        string friend3ImagerDir = @"C:\Users\yyeon\Pictures\Approved_People\YK";
 
         const string personGroupId = "my_friend5";
 
@@ -49,6 +49,45 @@ namespace FaceKey
             InitializeComponent();
         }
 
+        ////통신
+        //public static void sendImage()
+        //{
+        //    //클라이언트 소켓 생성
+        //    Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //    System.Diagnostics.Debug.WriteLine("소켓생성성공");
+        //    //서버와 연결
+        //    String IP = "192.168.24.233";
+        //    mySocket.Connect(IP, 11111);
+        //    System.Diagnostics.Debug.WriteLine("소켓생성성공");
+        //    //파일의 엶
+        //    String name = webCam.GetImageName();
+        //    System.Diagnostics.Debug.WriteLine("파일열기성공");
+        //    FileStream fileStr = new FileStream(name, FileMode.Open, FileAccess.Read);
+        //    //파일 크기를 가져옴
+        //    int fileLength = (int)fileStr.Length;
+        //    System.Diagnostics.Debug.WriteLine("파일크기 가져오기 성공");
+        //    //파일크기를 서버에 전송하기 위해 바이트 배열로 변환
+        //    byte[] buffer = BitConverter.GetBytes(fileLength);
+        //    System.Diagnostics.Debug.WriteLine("변환성공");          
+        //    //파일을 보낼 횟수
+        //    int count = fileLength / 1024 + 1;
+        //    //파일을 읽기 위해 BinaryRead 객체 생성
+        //    BinaryReader reader = new BinaryReader(fileStr);
+        //    System.Diagnostics.Debug.WriteLine("객체 생성성공");
+
+        //    //파일송신작업
+        //    for(int i=0; i < count; i++)
+        //    {
+        //        //파일을 읽음
+        //        buffer = reader.ReadBytes(1024);
+        //        //읽은 파일을 서버로 전송
+        //        mySocket.Send(buffer);
+        //    }
+        //    System.Diagnostics.Debug.WriteLine("서버전송성공");
+        //    //종료작업
+        //    reader.Close();
+        //    mySocket.Close();
+        //}
         //Define people for the person group and detect,add person
         private async Task CreatePersonGroup()
         {
@@ -58,29 +97,22 @@ namespace FaceKey
             {
                 await faceServiceClient.CreatePersonGroupAsync(personGroupId, "Approved_People");
                 System.Diagnostics.Debug.WriteLine("그룹만들기");
-                //Define 진선
-                CreatePersonResult friend1 = await faceServiceClient.CreatePersonAsync(
-                   // Id of the person group that the person belonged to
-                   personGroupId,
-                    //Name of the person
-                    "JinSeon");
-                System.Diagnostics.Debug.WriteLine("JinSeon 추가");
                 // Define Bill
-                CreatePersonResult friend2 = await faceServiceClient.CreatePersonAsync(
+                CreatePersonResult friend1 = await faceServiceClient.CreatePersonAsync(
                     //Id of the person group that the person belonged to
                     personGroupId,
                     // Name of the person
                     "Bill");
                 System.Diagnostics.Debug.WriteLine("Bill 추가");
                 //Define Clare
-                CreatePersonResult friend3 = await faceServiceClient.CreatePersonAsync(
+                CreatePersonResult friend2 = await faceServiceClient.CreatePersonAsync(
                     //Id of the person group that the person belonged to
                     personGroupId,
                     //Name of the person
                     "Clare");
                 System.Diagnostics.Debug.WriteLine("Clare 추가");
                 //Define 연경
-                CreatePersonResult friend4 = await faceServiceClient.CreatePersonAsync(
+                CreatePersonResult friend3 = await faceServiceClient.CreatePersonAsync(
                     //id of the person group that the person belonged to
                     personGroupId,
                     //name of the person
@@ -91,38 +123,27 @@ namespace FaceKey
                 {
                     using (Stream s = File.OpenRead(imagePath))
                     {
-                        //Detect faces in the image and add to Anna
                         await faceServiceClient.AddPersonFaceAsync(
-                            personGroupId, friend1.PersonId, s);
+                            personGroupId, friend1.PersonId, s);                    
                     }
-                    System.Diagnostics.Debug.WriteLine("JinSeon에 얼굴추가");
-                }//진선
+                    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
+                }//Bill
 
                 foreach (string imagePath in Directory.GetFiles(friend2ImagerDir, "*.jpg"))
                 {
                     using (Stream s = File.OpenRead(imagePath))
                     {
                         await faceServiceClient.AddPersonFaceAsync(
-                            personGroupId, friend2.PersonId, s);                    
+                            personGroupId, friend2.PersonId, s);
                     }
-                    System.Diagnostics.Debug.WriteLine("Bill에 얼굴추가");
-                }//Bill
-
+                    System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
+                }//Clare
                 foreach (string imagePath in Directory.GetFiles(friend3ImagerDir, "*.jpg"))
                 {
                     using (Stream s = File.OpenRead(imagePath))
                     {
                         await faceServiceClient.AddPersonFaceAsync(
                             personGroupId, friend3.PersonId, s);
-                    }
-                    System.Diagnostics.Debug.WriteLine("Clare에 얼굴추가");
-                }//Clare
-                foreach (string imagePath in Directory.GetFiles(friend4ImagerDir, "*.jpg"))
-                {
-                    using (Stream s = File.OpenRead(imagePath))
-                    {
-                        await faceServiceClient.AddPersonFaceAsync(
-                            personGroupId, friend4.PersonId, s);
                     }
                     System.Diagnostics.Debug.WriteLine("연경에 얼굴추가");
                 }//연경
@@ -177,7 +198,7 @@ namespace FaceKey
         {
             try
             {   //그룹이 이미 존재한다면 안 만들어도 된다.
-                System.Diagnostics.Debug.WriteLine("그룹체크 시작");
+                System.Diagnostics.Debug.WriteLine("그룹체크 시작");         
                 PersonGroup personGroup = await faceServiceClient.GetPersonGroupAsync(personGroupId);
             }
             //Catch and display Face API errors.           
@@ -282,6 +303,7 @@ namespace FaceKey
                         {
                             MessageBox.Show("외부인이 침입했습니다. 시동을 제한합니다.");
                             System.Diagnostics.Debug.WriteLine("외부인이 침입했습니다.");
+                            //sendImage();
                         }
                         else
                         {

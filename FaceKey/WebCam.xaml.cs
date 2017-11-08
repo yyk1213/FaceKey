@@ -78,10 +78,8 @@ namespace FaceKey
             System.Diagnostics.Debug.WriteLine("타이머 꺼짐");
             webCameraControl.StopCapture();
             MainWindow face = new MainWindow();
-            App.Current.MainWindow = face;
             this.Close();
             face.Show();
-
         }
     }
 }
